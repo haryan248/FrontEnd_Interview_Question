@@ -382,3 +382,201 @@ var Person = function (name, age) {
 };
 var me = new Person("Nana", 28); //Nana is 28 years old
 ```
+
+### Call by reference vs Call by value
+
+원시 데이터 타입 - number, string, boolean, undefined, null
+
+객체 - Array, object, function
+
+이때 원시 데이터 타입은 **값** 으로 전달되고 객체는 **참조** 로 \*\*\*\*전달된다.
+
+```jsx
+let name = "jacob";
+function changeName(name) {
+    name = "master jung";
+    return name;
+}
+
+console.log(changeName(name)); // master jung
+console.log(name); // jacob
+```
+
+**참조하고 있는 메모리 주소**가 아닌 **값**으로 전달되기 때문에 함수에서 변수에 대한 모든 변경 사항이 함수 외부에서 발생하는 변수와 완전히 분리되고, 값을 변경해도 원래 값의 실제 참조는 업데이트 되지 않는다.
+
+```jsx
+let nameObj = {
+    name: "jacob",
+};
+function changeName(nameObj) {
+    return (nameObj.name = "master jung");
+}
+
+console.log(changeName(nameObj)); // master jung
+console.log(nameObj); // master jung
+```
+
+왜냐하면 객체로 전달하면 값이 아닌 **참조**로 전달되기 때문에
+
+```jsx
+let nameObj = {
+    name: "jacob",
+};
+function changeName(nameObj) {
+    nameObj = {
+        name: "master jung",
+    };
+    return nameObj;
+}
+
+console.log(changeName(nameObj)); // master jung
+console.log(nameObj); // jacob
+```
+
+이유는 Call by sharing 때문
+
+함수가 참조를 새 객체 또는 배열에 대한 참조로 덤어 쓰면 새로운 메모리에 참조되며, 외부 객체에 영향을 주지 않는다.
+
+### JSON 과 AJAX
+
+json이란 Javascript object notation
+
+클라이언트와 서버 간 데이터 교환을 위한 규칙 즉 데이터 포맷
+
+Ajax(Asynchronous JavaScript and XML)는 자바스크립트를 이용해서 **비동기적(Asynchronous)**으로 서버와 브라우저가 데이터를 교환할 수 있는 통신 방식
+
+### ==과 ===
+
+== 은 동등(coercive) 연산자
+
+=== 은 일치(strict) 연산자
+
+-   '==' 연산자를 이용하여 서로 다른 유형의 두 변수의 [값] 비교
+-   '==='는 엄격한 비교를 하는 것으로 알려져 있다 ([값 & 자료형] -> true).
+
+### undefined vs null vs undeclared
+
+null
+
+-   변수를 선언하고 빈 변수임을 정해준다
+
+```jsx
+let n = null;
+console.log(n); // null
+console.log(typeof n); // object
+```
+
+undefined
+
+-   변수를 선언하고 값을 할당하기 전의 값이며 변수에 할당되어 있지 않은 상태
+
+```jsx
+let b;
+console.log(b); // undefined
+console.log(typeof b); // undefined
+```
+
+undeclared(미선언 변수)
+
+-   접근 가능한 스코프에 변수 선언조차 되어있지 않은 상태
+
+```jsx
+console.log(f); // Uncaught ReferenceError: f is not defined at <anonymous>:1:13
+```
+
+### let vs var vs const
+
+우선, `var`는 변수 선언 방식에 있어서 큰 단점을 가지고 있다.
+
+```
+    var name = 'bathingape'
+    console.log(name) // bathingape
+
+    var name = 'javascript'
+    console.log(name) // javascript
+```
+
+변수를 한 번 더 선언했음에도 불구하고, 에러가 나오지 않고 각기 다른 값이 출력되는 것을 볼 수 있다.
+
+그렇다면 `let` 과 `const` 의 차이점은 무엇일까?
+
+이 둘의 차이점은 `immutable` 여부이다.
+
+`let` 은 변수에 재할당이 가능하다. 그렇지만,
+
+```jsx
+let name = "bathingape";
+console.log(name); // bathingape
+
+let name = "javascript";
+console.log(name);
+// Uncaught SyntaxError: Identifier 'name' has already been declared
+
+name = "react";
+console.log(name); //react
+```
+
+`const`는 변수 재선언, 변수 재할당 모두 불가능하다.
+
+```jsx
+const name = "bathingape";
+console.log(name); // bathingape
+
+const name = "javascript";
+console.log(name);
+// Uncaught SyntaxError: Identifier 'name' has already been declared
+
+name = "react";
+console.log(name);
+//Uncaught TypeError: Assignment to constant variable.
+```
+
+let, const 는 블록 레벨 스코프
+
+let, const 키워드로 선언한 변수는 모두 코드 블록(ex. 함수, if, for, while, try/catch 문 등)을 지역 스코프로 인정하는 블록 레벨 스코프를 따른다.
+
+### 자바스크립트 동작 원리
+
+Callback Event Queue에서 하나 씩 꺼내 동작시키는 Loop.
+
+자바스크립트는 단일 스레드 기반 언어이기 때문에 한번에 하나씩 작업을 진행한다. 그러나 자바스크립트가 사용되는 환경을 생각해보면 많은 작업이 동시에 처리되고 있는 걸 볼 수 있다.
+
+자바스크립트는 이벤트 루프를 이용해서 비동기 방식으로 동시성을 지원한다.
+
+**call stack**
+
+Call stack은 함수의 호출을 저장하는 자료구조이다. 어떤 함수를 호출하면 스택에 쌓고 또 다른 함수를 호출하면 그 다음 스택에 쌓으면서 가장 위에 쌓인 함수를 가장 먼저 처리
+
+**메모리 힙**
+
+-   구조화되지 않은 넓은 메모리 영역을 말한다.
+-   객체들이 할당된다
+    -   프로그램에 선언한 변수, 함수 등
+
+![Untitled](https://s3-us-west-2.amazonaws.com/secure.notion-static.com/bf55f2c5-239f-40c8-887c-14e954ef1102/Untitled.png)
+
+### promise란
+
+프로미스는 자바스크립트 비동기 처리에 사용되는 객체
+
+-   Pending(대기) : 비동기 처리 로직이 아직 완료되지 않은 상태
+-   Fulfilled(이행) : 비동기 처리가 완료되어 프로미스가 결과 값을 반환해준 상태
+-   Rejected(실패) : 비동기 처리가 실패하거나 오류가 발생한 상태
+
+ES6 문법
+
+-   const and let
+-   Arrow functions(화살표 함수)
+-   Template Literals(템플릿 리터럴)
+-   Default parameters(기본 매개 변수)
+-   Array and object destructing(배열 및 객체 비구조화)
+-   Import and export(가져오기 및 내보내기)
+-   Promises(프로미스)
+-   Rest parameter and Spread operator(나머지 매개 변수 및 확산 연산자)
+-   Classes(클래스)
+
+## 3. 즉시 실행 함수를 사용하는 이유
+
+### 초기화
+
+즉시 실행 함수는 한 번의 실행만 필요로 하는 초기화 코드 부분에 많이 사용된다.그 이유는 **변수를 전역으로 선언하는 것을 피하기 위해서** 이다. 전역에 변수를 추가하지 않아도 되기 때문에 코드 충돌 없이 구현할 수 있어서 플러그인이나 라이브러리 등을 만들 때 많이 사용된다.
