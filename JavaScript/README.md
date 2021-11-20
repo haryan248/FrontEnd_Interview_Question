@@ -4,8 +4,7 @@ event delegation에 관해 설명해주세요.
 
 -   이벤트 버블링은 특정 화면 요소에서 이벤트가 발생했을 때 해당 이벤트가 더 상위의 화면 요소들로 전달되어 가는 특성
 
-![Untitled](https://s3-us-west-2.amazonaws.com/secure.notion-static.com/e8ef96ef-fa71-43a5-b5c1-6053ee1107c6/Untitled.png)
-
+![image](https://user-images.githubusercontent.com/51049245/142718365-eb6d5254-2683-4422-8981-f46227faed56.png)
 ```jsx
 var divs = document.querySelectorAll("div");
 divs.forEach(function (div) {
@@ -21,7 +20,7 @@ function logEvent(event) {
 
 -   이벤트 버블링과 반대 방향으로 진행되는 이벤트 전파 방식
 
-![Untitled](https://s3-us-west-2.amazonaws.com/secure.notion-static.com/4e7973cb-b019-4b4d-bd7e-c228b4843944/Untitled.png)
+![image](https://user-images.githubusercontent.com/51049245/142718379-14589e49-76bd-41fc-a661-0c90d71067c3.png)
 
 ```jsx
 var divs = document.querySelectorAll("div");
@@ -553,7 +552,7 @@ Call stack은 함수의 호출을 저장하는 자료구조이다. 어떤 함수
 -   객체들이 할당된다
     -   프로그램에 선언한 변수, 함수 등
 
-![Untitled](https://s3-us-west-2.amazonaws.com/secure.notion-static.com/bf55f2c5-239f-40c8-887c-14e954ef1102/Untitled.png)
+![image](https://user-images.githubusercontent.com/51049245/142718387-2d1d9141-c760-4f83-8b4f-2c13034def99.png)
 
 ### promise란
 
