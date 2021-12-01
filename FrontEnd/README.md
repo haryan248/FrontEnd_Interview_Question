@@ -20,7 +20,7 @@
 
 ### 브라우저의 동작 원리(랜더링 원리)
 
-![Untitled](https://s3-us-west-2.amazonaws.com/secure.notion-static.com/b2fcfcc4-2f10-40d6-95f6-6fc646fad706/Untitled.png)
+![image](https://user-images.githubusercontent.com/51049245/142718390-35c7621e-34c9-4931-94f4-1a4ce931ac4d.png)
 
 -   사용자 인터페이스: 주소 표시줄, 이전/다음 버튼, 북마크 등 페이지 뷰 이외의 다른 부분
 -   브라우저 엔진: 사용자 인터페이스와 렌더링 엔진 사이 동작 제어
