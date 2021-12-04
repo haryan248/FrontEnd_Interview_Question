@@ -9,4 +9,4 @@
 -   [운영체제](https://github.com/haryan248/FrontEnd_Interview_Question/tree/main/OS)
 -   [데이터베이스](https://github.com/haryan248/FrontEnd_Interview_Question/tree/main/Database)
 -   [프론트엔드](https://github.com/haryan248/FrontEnd_Interview_Question/tree/main/FrontEnd)
--   [개인 프로젝트](https://github.com/haryan248/FrontEnd_Interview_Question/tree/main/MyProject)
+-   [개인 프로젝트](https://github.com/haryan248/FrontEnd_Interview_Question/tree/main/ETC)
