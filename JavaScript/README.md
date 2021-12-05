@@ -5,6 +5,7 @@ event delegation에 관해 설명해주세요.
 -   이벤트 버블링은 특정 화면 요소에서 이벤트가 발생했을 때 해당 이벤트가 더 상위의 화면 요소들로 전달되어 가는 특성
 
 ![image](https://user-images.githubusercontent.com/51049245/142718365-eb6d5254-2683-4422-8981-f46227faed56.png)
+
 ```jsx
 var divs = document.querySelectorAll("div");
 divs.forEach(function (div) {
@@ -579,3 +580,199 @@ ES6 문법
 ### 초기화
 
 즉시 실행 함수는 한 번의 실행만 필요로 하는 초기화 코드 부분에 많이 사용된다.그 이유는 **변수를 전역으로 선언하는 것을 피하기 위해서** 이다. 전역에 변수를 추가하지 않아도 되기 때문에 코드 충돌 없이 구현할 수 있어서 플러그인이나 라이브러리 등을 만들 때 많이 사용된다.
+
+## 최소한의 메모리 관리에 신경 쓰는 방법
+
+### **1. 의도치 않은 전역 변수 생성을 막기**
+
+**자바스크립트는 선언되지 않고 사용한 변수를 전역 변수로 처리하도록 되어 있다.**
+
+```jsx
+function(){
+  foo = "inyong~";
+}
+
+// 실행 시 아래와 동일function(){
+  window.foo = "inyong~";// window는 브라우저 내 최상단 DOM 오브젝트
+}
+```
+
+var, let, const를 선언하지 않고 사용하게 되면, 해당 변수는 전역 객체의 하위 오브젝트로 지정됨으로써 전역 변수로 사용된다. 이로 인해 foo변수는 사용하지 않더라도 계속해서 불필요한 메모리로 남게 될 것이다.
+
+또한 this를 이용해서도 뜻하지 않은 전역 변수를 생성할 수도 있다. 아래 예시를 봐보자.
+
+```jsx
+function foo() {
+    const bar = {
+        a: function () {
+            console.log(this);
+        },
+    };
+    // bar.a(); // {a:f함수} 출력
+}
+
+foo();
+```
+
+this는 자신을 감싸고 있는 오브젝트를 가리킨다. 그래서 위 코드에서는 this 감싸고 있는 오브젝트는 bar인 것을 알 수 있다. 그러나 아래 코드를 확인해보자.
+
+```jsx
+function foo() {
+    this.bar = "potential accidental global";
+}
+// 다른 함수 내에 있지 않은 foo를 호출하면 this는 글로벌 객체(window)를 가리킴
+foo();
+```
+
+여기서는 this를 감싸고 있는 특정 오브젝트가 없다. 정확히 말하면 글로벌 오브젝트인 window가 감싸고 있는 형태이므로 여기서 this는 window를 가리키게 된다. 그래서 위처럼 this.bar를 이용하게 되면 해당 bar 변수도 전역 변수가 되어버리고 만다.
+
+이러한 방식은 의도적으로 가비지 컬렉터가 정리할 수 없게 하기 위해 전역 변수 방식으로 사용할 수도 있지만, 그것이 아니고 임시로 정보를 저장하여 사용하는 것, 특히나 많은 양의 정보를 처리할 때 사용하는 용도라면 이러한 점을 조심해야 할 것이다.
+
+### **2. 잊혀진 타이머 혹은 콜백 함수**
+
+자바스크립트에 많이 사용되는 타이머 함수와 콜백 함수로 인해서도 메모리 누수가 발생할 수 있다.아래의 setInterval을 예시로 확인해보자.
+
+```jsx
+function timeRun() {
+    var serverData = "hello~inyong";
+
+    setInterval(function () {
+        var element = document.getElementById("someID");
+        if (element) {
+            element.innerHTML = JSON.stringify(serverData);
+        }
+    }, 5000); // 매 5초 마다 실행
+}
+
+timeRun();
+```
+
+위 코드에서 보면 매 5초마다 특정 DOM 엘리먼트를 가져와서 하위로 serverData 변수 값을 주입한다. 해당 이벤트는 계속 활성화 상태가 되므로 해당 이벤트에 연결되어 있는 serverData 변수 메모리도 계속해서 사용하는 것으로 간주되어 그대로 남아있다.
+
+그러나 해당 엘리먼트는 다른 곳에서 언제든지 제거할 수 있는 가능성을 가지고 있고, 만약 제거가 된다면 serInterval()의 타이머 함수는 더 이상 의미 없는 이벤트 동작이 된다.
+
+그럼에도 불구하고 해당 setInterval 이벤트는 아직 활성 상태이므로 가비지 컬렉터가 이 이벤트 핸들러와 해당 이벤트 내부에서 사용되는 메모리들을 해제하지 않게 되고 5초마다 의미 없는 이벤트가 계속해서 동작하여 CPU의 낭비를 초래하게 된다.
+
+그나마 다행인 것은 serverData 변수에 할당된 메모리는 더 이상 사용하고 있는 곳이 없고 접근할 수 있는 연결고리가 없으므로 바로 가비지 컬렉션이 일어난다. 만약 serverData 변수가 setInterval 이벤트 내부에 있었으면 이 변수 또한 그대로 불필요한 메모리를 차지하고 있었을 것이다.
+
+그렇기에 이러한 타이머 함수를 사용할 때는 해당 타이머의 이벤트가 더 이상 의미가 없어졌을 때, 꼭 명시적으로 그것을 제거해야 할 필요가 있다.
+
+### **3. 클로저**
+
+우선 여기 부분을 이해하려면 스코프 체이닝에 대한 개념을 잘 알고 있어야 한다. 클로저를 이용하게 되면 함수가 끝나도 아직 스코프 체인이 그대로 남아 있어서 끝났던 함수 내의 요소들을 참조할 수 있으므로 메모리에서 사라지지 않는다.
+
+Meteor라는 개발자들이 해당 클로저로 인해 발생하는 메모리 누수의 [특정 사례](https://blog.meteor.com/an-interesting-kind-of-javascript-memory-leak-8b47d2e7f156)에 대해 설명한 글을 봤는데, 정말 너무 이해가 안 갔었다.. 이해하는데 이틀 정도 걸렸던 것 같다...
+
+우선 같이 코드를 봐보자.
+
+```jsx
+var theThing = null;
+
+var replaceThing = function () {
+    var originalThing = theThing;
+
+    theThing = {
+        longStr: new Array(1000000).join("*"),
+        someMethod: function () {
+            console.log(someMessage);
+        },
+    };
+};
+
+setInterval(replaceThing, 1000);
+```
+
+위 코드를 보면 replaceThing 함수를 1초에 한 번씩 실행시키는데, 아래에서 동작 과정을 나열해보겠다. 편의 상, 첫 번째로 호출된 replaceThing을 replaceThing(1), 두 번째 호출은 replaceThing(2)로 작성하겠다.
+
+1. replaceThing(1)은 theThing 전역 변수에 새 오브젝트는 넣는다. originalThing은 null이다.
+2. 그다음 replaceThing(2)이 호출되고, originalThing에는 전역 변수 theThing에 의해 replaceThing(1)에서 생성되었던 값을 참조하게 한다.
+3. 그다음 전역 변수 theThing에 다시 새로운 값을 넣는다. 이때 생성된 값 중 내부 함수인 someMethod는 originalThing을 참조할 수 있다. (위 코드에서는 실제로는 참조는 안 하고 있지만, 더 내부에 있는 someMethod는 바로 부모 스코프인 영역들을 참조할 수 있도록 스코프 체인을 이루고 있으면 메로리 해제를 하지 않는다.)
+4. 현재 replaceThing(2)의 originalThing 변수는 이전 replaceThing(1)을 참조하고 있다. 그리고 현재 replaceThing(2)에서 새로 만든 theThing의 값은 originalThing을, 즉 이전에 만들었던 값과 스코프 체인을 이루게 되는 것이다.
+
+그래서 결국 replaceThing이 호출될 때마다 이전의 theThing과 새로운 theThing이 계속해서 스코프 체인이 이루어지므로 참조할 수 있는 영역으로 판단하여 가비지 컬렉션이 이루어지지 않아야 한다.
+
+하지만 구글의 V8 엔진에서는 멋지게도 이러한 요소들까지 고려하여 setInterval 함수로 인해 불필요하게 스코프 체이닝이 일어나면 이전의 스포크 체인을 없애준다. 그래서 위 코드는 setInterval이 동작할 때마다 메모리가 일정하게 된다.
+
+하지만 문제의 코드는 바로 아래이다.
+
+```jsx
+var theThing = null;
+
+var replaceThing = function () {
+  var originalThing = theThing;
+
+  var unused = function () {
+    if (originalThing)// 'originalThing'에 대한 참조console.log("hi");
+  };
+
+  theThing = {
+    longStr: new Array(1000000).join('*'),
+    someMethod: function () {
+      console.log("message");
+    }
+  };
+};
+setInterval(replaceThing, 1000);
+```
+
+위 코드의 동작 과정을 확인해보자.
+
+1. replaceThing(1)은 theThing 전역 변수에 새 오브젝트는 넣는다. originalThing은 null이다.
+2. 그다음 replaceThing(2)이 호출되고, originalThing에는 전역 변수 theThing에 의해 replaceThing(1)에서 생성되었던 값을 참조하게 한다.
+3. 그다음 내부 함수인 unused 변수를 생성한다. unused는 originalThing을 사용한다. 즉, 현재 replaceThing(2)의 ununsed 내부 함수 안에 replaceThing(1)의 someMethod 내부 함수가 있는 것이다. 정리하면 replaceThing함수 내부에 unused 내부 함수에 someMethod 내부 함수가 있는 것임. 3중 내부 함수.
+4. 그다음 전역 변수 theThing에 다시 새로운 값을 넣는다. 이때 생성된 값 중 내부 함수인 someMethod는 originalThing과 unused를 참조할 수 있다.(여기서 중요!) 이때 someMethod가 참조하고 있는 unused는 내부 함수이다. 여기까지만 생각하면 unused 변수 위에 originalThing(이전에 생성된 값)의 someMethod와 스코프를 이루는 것과 같이 차이가 없다. (원래는 스코프 체이닝 연결이 돼서 가비지 컬렉션이 이루어지지 않아야 되는 것을 위에 말했듯이 멋쟁이 구글 V8가 이를 알아서 처리해줌)하지만 unused의 내부 함수는 또 하나의 내부 함수를 포함하고 있다. (originalThing, 즉 이전에 생성된 someMethod 함수)그러니까 결국 replace(2)에서 생성된 someMethod 함수는 바로 상위의 unused 함수와 스코프 체인을 이루면서도 unused 함수의 내부 함수 someMethod(replace(1)에서 생성했던 값)까지 스코프 체인을 이루게 되는 것이다.
+
+이렇게 더 깊이 스코프 체이닝이 이루어지는 것은 V8에서 처리를 하지 못하는 것 같다. 그래서 결국 replaceThing이 실행이 될 때마다 계속해서 스코프 체이닝이 이루어지고 참조할 수 있는 것으로 판단하여 메모리가 계속해서 증가하게 된다.
+
+### **4. DOM에서 벗어난 요소 참조**
+
+DOM 엘리먼트들을 빠르게 불러와서 바로 사용하기 위해 특정 데이터 요소에 저장하여 사용하는 경우가 있다. 예를 들면 아래 코드에서 첫 번째 줄처럼 사용할 수도 있고, 혹은 특정 배열에 저장해서 사용할 수도 있을 것이다. 그러나 만약 이렇게 사용 중인 엘리먼트를 제거하기로 결정하면, DOM 트리 자체에서 제거하는 것뿐 아니라, 변수에 저장하여 참조하고 있는 연결고리도 함께 제거해 주어야 한다는 것을 잊으면 안 된다.
+
+```jsx
+var elements = {
+    button: document.getElementById("button"),
+    image: document.getElementById("image"),
+};
+
+function doStuff() {
+    elements.image.src = "http://example.com/image_name.png";
+}
+
+function removeImage() {
+    // image는 body 요소의 바로 아래 자식임document.body.removeChild(document.getElementById('image'));
+    // 이 순간까지 #button 전역 요소 객체에 대한 참조가 아직 존재함// 즉, button 요소는 아직도 메모리 상에 있고 가비지컬렉터가 가져갈 수 없음
+}
+```
+
+위 코드에서 removeImage() 함수를 실행시키면, image DOM 오브젝트가 DOM Tree에서는 삭제가 되므로 화면 상에서는 사라질 것이다. 그러나 해당 DOM 오브젝트는 첫 번째 줄의 elements변수에서 아직 참조를 하고 있는 중이므로 가비지 컬렉션이 일어나지 않게 되고 메모리 누수가 일어나게 된다.
+
+같은 경우에 대해 더욱 극심한 예시도 있다. 아래 코드를 확인해보자.
+
+```jsx
+var elements = {
+    td: document.getElementById("td"), // <table> 내 셀 태그인 <td>
+};
+
+function removeTable() {
+    document.body.removeChild(document.getElementById("tableID")); // <table> 태그 제거// td 엘리먼트가 아직 참조 중이므로, 모든 table 내 데이터가 그대로 유지
+}
+```
+
+DOM Tree에서 Table DOM 엘리먼트를 제거했다. 그러나 Table 오브젝트의 하위인 td 셀 태그 엘리먼트가 여전히 참조되고 있다. td 엘리먼트는 table엘리먼트를 참조하고 있으므로 해당 td 뿐 아니라 Table DOM 엘리먼트 내에서 사용되던 많은 오브젝트들이 메모리에서 제거되지 않고 여전히 남아있게 되어 커다란 누수가 일어나게 되는 것이다.
+
+```jsx
+function useTd() {
+    var elements = {
+        td: document.getElementById("td"), // <table> 내 셀 태그인 <td>
+    };
+}
+
+function removeTable() {
+    document.body.removeChild(document.getElementById("tableID")); // <table> 태그 제거
+}
+
+useTd();
+removeTable();
+```
+
+다행히도 위 코드와 같이 td참조 방식이 전역 변수 관리가 아닌 함수 내 지역 변수로 잠깐 이용하는 것이라면, Table 오브젝트가 DOM Tree가 삭제되면서 정상적으로 가비지 컬렉션이 일어날 것이다. 왜냐하면  DOM Tree로 Table 오브젝트가 삭제된 뒤 useTd() 함수 내에서 elements 변수가 참조를 하고 있지만, 최상위 roots 오브젝트에서 더 이상 elements 변수에 접근할 수 없게 되었으므로 '표시하고-쓸기(Mark-and-weep)'에 의해 가비지 컬렉션 대상이 되어버리기 때문이다.

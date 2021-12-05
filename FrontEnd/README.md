@@ -237,3 +237,22 @@ HTTP에서 클라이언트의 상태 정보를 클라이언트의 PC에 저장�
 **장점:** 코드의 사용면에서 코드량을 크게 줄여 줍니다.
 
 **단점:** 변화에 따라 DOM 객체 전체를 랜더링 해주거나 데이터를 바꿔주므로 성능이 감소되는 경우가 있습니다.
+
+## babel plugins에서는 번들로 babel preset이 함께 온다
+
+babel foundation에서는 **plugin들을 포함한 번들(plugin들을 모아놓은 파일이라고 생각하면 된다)파일을 포함 `preset`을 만들었다.**
+
+npm 설치와 babel 설정을 한번만 하면 plugin들이 자동적으로 설치
+
+다양한 babel preset들이 있는데 babel foundadtion에서 제공하는 **공식 preset**과 Airbnb같은 곳에서 제공하는 **비공식 preset**이 있다. 심지어 우리가 만들 수도 있다.
+
+공식 preset은:
+
+-   @babel/preset-env
+-   @babel/preset-flow
+-   @babel/preset-react
+-   @babel/preset-typescript
+
+각각의 preset은우리가 설치 설정해야할 npm dependency를 가지고 있다.드디어 우리는 `babel-preset-env`를 실행할 준비가 되었다
+
+[https://jeonghwan-kim.github.io/series/2019/12/22/frontend-dev-env-babel.html](https://jeonghwan-kim.github.io/series/2019/12/22/frontend-dev-env-babel.html)
