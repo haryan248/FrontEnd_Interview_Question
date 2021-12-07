@@ -64,3 +64,25 @@ SSL 터미네이션을 사용할 수 있다.
 -   서버가 복호화 과정을 담당하지 않도록 할 수 있다.
 
 HSTS, CORS 처리, TCP/UDP 커넥션 부하 분산, HTTP/2 지원
+
+### **객체 지향적 설계 원칙**
+
+1. **SRP(Single Responsibility Principle) :** 단일 책임 원칙
+
+-   클래스는 단 하나의 책임을 가져야 하며 클래스를 변경하는 이유는 단 하나의 이유이어야 한다.
+
+1. **OCP(Open-Closed Principle)** : 개방-폐쇄 원칙
+
+-   확장에는 열려 있어야 하고 변경에는 닫혀 있어야 한다.
+
+1. **LSP(Liskov Substitution Principle)** : 리스코프 치환 원칙
+
+-   상위 타입의 객체를 하위 타입의 객체로 치환해도 상위 타입을 사용하는 프로그램은 정상적으로 동작해야 한다.
+
+1. **ISP(Interface Segregation Principle)** : 인터페이스 분리 원칙
+
+-   인터페이스는 그 인터페이스를 사용하는 클라이언트를 기준으로 분리해야 한다.
+
+1. **DIP(Dependency Inversion Principle)** : 의존 역전 원칙
+
+-   고수준 모듈은 저수준 모듈의 구현에 의존해서는 안된다.
