@@ -10,3 +10,4 @@
 -   [데이터베이스](https://github.com/haryan248/FrontEnd_Interview_Question/tree/main/Database)
 -   [프론트엔드](https://github.com/haryan248/FrontEnd_Interview_Question/tree/main/FrontEnd)
 -   [개인 프로젝트](https://github.com/haryan248/FrontEnd_Interview_Question/tree/main/ETC)
+-   [디자인 패턴](https://github.com/haryan248/FrontEnd_Interview_Question/tree/main/DesignPattern)
