@@ -5,6 +5,7 @@
 -   [HTML](https://github.com/haryan248/FrontEnd_Interview_Question/tree/main/HTML)
 -   [CSS](https://github.com/haryan248/FrontEnd_Interview_Question/tree/main/CSS)
 -   [JavaScript](https://github.com/haryan248/FrontEnd_Interview_Question/tree/main/JavaScript)
+-   [자료구조](https://github.com/haryan248/FrontEnd_Interview_Question/tree/main/DataStructure)
 -   [알고리즘](https://github.com/haryan248/FrontEnd_Interview_Question/tree/main/Algorithm)
 -   [네트워크](https://github.com/haryan248/FrontEnd_Interview_Question/tree/main/Network)
 -   [운영체제](https://github.com/haryan248/FrontEnd_Interview_Question/tree/main/OS)
